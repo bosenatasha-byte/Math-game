@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Math Practice</title>
+    <!-- PWA & Theme -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#a2d2ff">
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #4a4a4a;
+            --accent: #a2d2ff;
+            --success: #c1f0c1;
+            --error: #ffc8dd;
+            --radius: 28px;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: var(--text-main);
+            transition: background-color 0.8s ease; /* Smooth Level Up transition */
+            overflow: hidden;
+        }
+
+        /* Streak Counter */
+        #streak-display {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: rgba(0,0,0,0.3);
+        }
+
+        .app-container {
+            background: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: var(--radius);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        #problem {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            letter-spacing: -2px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.8rem;
+            border: 3px solid #f0f0f0;
+            border-radius: 20px;
+            outline: none;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus { border-color: var(--accent); }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            background-color: var(--accent);
+            color: white;
+            box-shadow: 0 4px 0px rgba(0,0,0,0.1);
+        }
+
+        button:active { transform: translateY(2px); box-shadow: none; }
+
+        #feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            display: none;
+        }
+
+        /* Bouncy Animation for Feedback */
+        .bounce-in {
+            display: block !important;
+            animation: bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .correct { background-color: var(--success); color: #2d5a2d; }
+        .wrong { background-color: var(--error); color: #853a47; }
+
+        #next-btn {
+            background-color: #4a4a4a;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="streak-display">STREAK: 0</div>
+
+    <div class="app-container">
+        <div id="problem">-- × --</div>
+        <input type="number" id="user-answer" placeholder="?" inputmode="numeric">
+        <button id="check-btn" onclick="checkAnswer()">Check Answer</button>
+        <div id="feedback"></div>
+        <button id="next-btn" onclick="nextProblem()">Next Question →</button>
+    </div>
+
+<script>
+    let currentAnswer = 0;
+    let streak = 0;
+    
+    // Nice pastel colors for "Level Up"
+    const levelColors = ['#f8f9fa', '#e0f7fa', '#f3e5f5', '#fff9c4', '#e8f5e9', '#ffebee', '#e3f2fd'];
+    let colorIndex = 0;
+
+    function generateProblem() {
+        const isMultiplication = Math.random() > 0.5;
+        const num1 = Math.floor(Math.random() * 10) + 1;
+        const num2 = Math.floor(Math.random() * 10) + 1;
+        const problemEl = document.getElementById('problem');
+        
+        if (isMultiplication) {
+            currentAnswer = num1 * num2;
+            problemEl.innerText = `${num1} × ${num2}`;
+        } else {
+            const dividend = num1 * num2;
+            currentAnswer = num1; 
+            problemEl.innerText = `${dividend} ÷ ${num2}`;
+        }
+    }
+
+    function triggerCelebration() {
+        // High-energy burst from the center
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#a2d2ff', '#ffc8dd', '#c1f0c1', '#ffffff'],
+            shapes: ['circle', 'square', 'star'], // Star shapes added for sparkles!
+            ticks: 200
+        });
+    }
+
+    function checkAnswer() {
+        const inputEl = document.getElementById('user-answer');
+        const feedbackEl = document.getElementById('feedback');
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const streakEl = document.getElementById('streak-display');
+
+        if (inputEl.value === "") return;
+
+        if (parseInt(inputEl.value) === currentAnswer) {
+            streak++;
+            feedbackEl.innerText = "Correct! ✨";
+            feedbackEl.className = "correct bounce-in";
+            triggerCelebration();
+
+            // Level Up logic
+            if (streak > 0 && streak % 5 === 0) {
+                colorIndex = (colorIndex + 1) % levelColors.length;
+                document.body.style.backgroundColor = levelColors[colorIndex];
+                feedbackEl.innerText = `LEVEL UP! Streak of ${streak}! 🔥`;
+            }
+        } else {
+            streak = 0; // Reset streak on mistake
+            feedbackEl.innerText = `Try Again! It was ${currentAnswer}`;
+            feedbackEl.className = "wrong bounce-in";
+        }
+
+        streakEl.innerText = `STREAK: ${streak}`;
+        checkBtn.style.display = 'none';
+        nextBtn.style.display = 'block';
+    }
+
+    function nextProblem() {
+        const inputEl = document.getElementById('user-answer');
+        inputEl.value = "";
+        document.getElementById('feedback').className = "";
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        generateProblem();
+        inputEl.focus();
+    }
+
+    // Keyboard support
+    document.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            if (document.getElementById('next-btn').style.display === 'block') nextProblem();
+            else checkAnswer();
+        }
+    });
+
+    // Start
+    generateProblem();
+
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js');
+    }
+</script>
+</body>
+</html>
