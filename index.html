@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Math</title>
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#a2d2ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #4a4a4a;
+            --accent: #a2d2ff;
+            --success: #c1f0c1;
+            --error: #ffc8dd;
+            --shadow: 0 10px 30px rgba(0,0,0,0.05);
+            --radius: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        .app-container {
+            background: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        #problem {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: -2px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5rem;
+            border: 2px solid #eee;
+            border-radius: 16px;
+            outline: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            background-color: var(--accent);
+            color: white;
+        }
+
+        #next-btn {
+            background-color: #bde0fe;
+            margin-top: 10px;
+            display: none;
+            color: #4a4a4a;
+        }
+
+        #feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 16px;
+            font-weight: 600;
+            display: none;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .correct { background-color: var(--success); color: #2d5a2d; }
+        .wrong { background-color: var(--error); color: #853a47; }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(10px) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="problem">-- × --</div>
+    <input type="number" id="user-answer" placeholder="Answer" inputmode="numeric">
+    <button id="check-btn" onclick="checkAnswer()">Check</button>
+    <div id="feedback"></div>
+    <button id="next-btn" onclick="nextProblem()">Next Problem</button>
+</div>
+
+<script>
+    // 1. REGISTER SERVICE WORKER
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js');
+    }
+
+    // 2. GAME LOGIC
+    let currentAnswer = 0;
+
+    function generateProblem() {
+        const isMultiplication = Math.random() > 0.5;
+        const num1 = Math.floor(Math.random() * 10) + 1;
+        const num2 = Math.floor(Math.random() * 10) + 1;
+        const problemEl = document.getElementById('problem');
+        
+        if (isMultiplication) {
+            currentAnswer = num1 * num2;
+            problemEl.innerText = `${num1} × ${num2}`;
+        } else {
+            const dividend = num1 * num2;
+            currentAnswer = num1; 
+            problemEl.innerText = `${dividend} ÷ ${num2}`;
+        }
+    }
+
+    function checkAnswer() {
+        const userInput = document.getElementById('user-answer').value;
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const checkBtn = document.getElementById('check-btn');
+
+        if (userInput === "") return;
+
+        feedbackEl.style.display = 'block';
+        if (parseInt(userInput) === currentAnswer) {
+            feedbackEl.innerText = "Correct! ✨";
+            feedbackEl.className = "correct";
+        } else {
+            feedbackEl.innerText = `Try Again! Answer: ${currentAnswer}`;
+            feedbackEl.className = "wrong";
+        }
+        checkBtn.style.display = 'none';
+        nextBtn.style.display = 'block';
+    }
+
+    function nextProblem() {
+        document.getElementById('user-answer').value = "";
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+        generateProblem();
+        document.getElementById('user-answer').focus();
+    }
+
+    document.getElementById('user-answer').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            if (document.getElementById('next-btn').style.display === 'block') nextProblem();
+            else checkAnswer();
+        }
+    });
+
+    generateProblem();
+</script>
+
+</body>
+</html>
