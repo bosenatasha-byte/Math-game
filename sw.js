@@ -1,4 +1,4 @@
-const cacheName = 'math-v1';
+const cacheName = 'math-v2';
 const assets = [
   './',
   './index.html',
