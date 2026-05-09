@@ -3,141 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Math</title>
-    
-    <!-- 1. Load the library FIRST -->
+    <title>Strawberry Pop Math</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF0000">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <!-- 2. Manifest and CSS -->
-    <link rel="manifest" href="manifest.json">
     <style>
         :root {
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-main: #4a4a4a;
-            --accent: #a2d2ff;
-            --success: #c1f0c1;
-            --error: #ffc8dd;
-            --radius: 28px;
+            --strawberry: #FF0000;
+            --lime: #32CD32;
+            --ice: #AFDBF5;
+            --white: #FFFFFF;
+            --black: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial Black', Gadget, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--lime);
             margin: 0;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: var(--text-main);
-            transition: background-color 0.8s ease; /* Smooth Level Up transition */
+            transition: background-color 0.2s ease;
             overflow: hidden;
         }
 
-        /* Streak Counter */
-        #streak-display {
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: rgba(0,0,0,0.3);
-        }
-
         .app-container {
-            background: var(--card-bg);
-            padding: 40px 30px;
-            border-radius: var(--radius);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            background: var(--white);
+            padding: 30px;
+            border: 4px solid var(--black);
+            box-shadow: 8px 8px 0px var(--black);
             width: 90%;
             max-width: 400px;
             text-align: center;
-            z-index: 10;
+            position: relative;
         }
 
         #problem {
-            font-size: 4.5rem;
-            font-weight: 800;
-            margin-bottom: 25px;
-            letter-spacing: -2px;
+            font-size: 5rem;
+            margin-bottom: 20px;
+            color: var(--black);
+            display: inline-block;
         }
 
+        /* Input Styling */
         input[type="number"] {
             width: 100%;
-            padding: 18px;
-            font-size: 1.8rem;
-            border: 3px solid #f0f0f0;
-            border-radius: 20px;
+            padding: 15px;
+            font-size: 2rem;
+            border: 4px solid var(--black);
             outline: none;
             text-align: center;
             margin-bottom: 20px;
-            transition: border-color 0.3s;
+            background: var(--white);
         }
 
-        input:focus { border-color: var(--accent); }
-
+        /* Neo-brutalism Buttons */
         button {
             width: 100%;
-            padding: 18px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            border: none;
-            border-radius: 20px;
+            padding: 20px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: 4px solid var(--black);
             cursor: pointer;
-            background-color: var(--accent);
-            color: white;
-            box-shadow: 0 4px 0px rgba(0,0,0,0.1);
+            background-color: var(--strawberry);
+            color: var(--white);
+            box-shadow: 4px 4px 0px var(--black);
+            margin-bottom: 10px;
         }
 
-        button:active { transform: translateY(2px); box-shadow: none; }
-
-        #feedback {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 20px;
-            font-weight: 700;
-            display: none;
+        button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--black);
         }
-
-        /* Bouncy Animation for Feedback */
-        .bounce-in {
-            display: block !important;
-            animation: bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes bounce {
-            0% { transform: scale(0.5); opacity: 0; }
-            70% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .correct { background-color: var(--success); color: #2d5a2d; }
-        .wrong { background-color: var(--error); color: #853a47; }
 
         #next-btn {
-            background-color: #4a4a4a;
+            display: none;
+            background-color: var(--black);
+        }
+
+        /* Animations */
+        @keyframes shiver {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            100% { transform: translate(0,0) rotate(0); }
+        }
+
+        .shivering {
+            animation: shiver 0.2s infinite;
+            color: var(--ice) !important;
+        }
+
+        /* Brain Freeze Ice Cube */
+        #ice-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10rem;
+            display: none;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        @keyframes ice-shake {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-52%, -48%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .ice-active {
+            display: block !important;
+            animation: ice-shake 0.3s infinite;
+        }
+
+        #feedback {
+            font-size: 1.5rem;
             margin-top: 10px;
+            font-weight: bold;
             display: none;
         }
     </style>
 </head>
 <body>
 
-    <div id="streak-display">STREAK: 0</div>
+<div id="ice-overlay">🧊</div>
 
-    <div class="app-container">
-        <div id="problem">-- × --</div>
-        <input type="number" id="user-answer" placeholder="?" inputmode="numeric">
-        <button id="check-btn" onclick="checkAnswer()">Check Answer</button>
-        <div id="feedback"></div>
-        <button id="next-btn" onclick="nextProblem()">Next Question →</button>
-    </div>
+<div class="app-container">
+    <div id="problem">-- × --</div>
+    
+    <input type="number" id="user-answer" placeholder="?" inputmode="numeric">
+
+    <button id="check-btn" onclick="checkAnswer()">CHECK!</button>
+    <div id="feedback"></div>
+    <button id="next-btn" onclick="nextProblem()">NEXT →</button>
+</div>
 
 <script>
     let currentAnswer = 0;
-    let streak = 0;
-    
-    // Nice pastel colors for "Level Up"
-    const levelColors = ['#f8f9fa', '#e0f7fa', '#f3e5f5', '#fff9c4', '#e8f5e9', '#ffebee', '#e3f2fd'];
-    let colorIndex = 0;
 
     function generateProblem() {
         const isMultiplication = Math.random() > 0.5;
@@ -147,70 +161,84 @@
         
         if (isMultiplication) {
             currentAnswer = num1 * num2;
-            problemEl.innerText = `${num1} × ${num2}`;
+            problemEl.innerText = `${num1}×${num2}`;
         } else {
             const dividend = num1 * num2;
             currentAnswer = num1; 
-            problemEl.innerText = `${dividend} ÷ ${num2}`;
+            problemEl.innerText = `${dividend}÷${num2}`;
         }
     }
 
-    function triggerCelebration() {
-        // High-energy burst from the center
+    function strawberryBurst() {
+        // Burst of Red/Pink Confetti
         confetti({
-            particleCount: 100,
+            particleCount: 150,
             spread: 70,
             origin: { y: 0.6 },
-            colors: ['#a2d2ff', '#ffc8dd', '#c1f0c1', '#ffffff'],
-            shapes: ['circle', 'square', 'star'], // Star shapes added for sparkles!
-            ticks: 200
+            colors: ['#FF0000', '#FF69B4', '#FFFFFF']
+        });
+
+        // Burst of Strawberry Emojis
+        const scalar = 3;
+        const strawberry = confetti.shapeFromText({ text: '🍓', scalar });
+
+        confetti({
+            shapes: [strawberry],
+            particleCount: 20,
+            scalar,
+            origin: { y: 0.6 }
         });
     }
 
+    function brainFreeze() {
+        const body = document.body;
+        const ice = document.getElementById('ice-overlay');
+        const problem = document.getElementById('problem');
+
+        // Flash background
+        body.style.backgroundColor = 'var(--ice)';
+        ice.classList.add('ice-active');
+        problem.classList.add('shivering');
+
+        setTimeout(() => {
+            body.style.backgroundColor = 'var(--lime)';
+            ice.classList.remove('ice-active');
+            problem.classList.remove('shivering');
+        }, 1500);
+    }
+
     function checkAnswer() {
-        const inputEl = document.getElementById('user-answer');
-        const feedbackEl = document.getElementById('feedback');
-        const checkBtn = document.getElementById('check-btn');
+        const input = document.getElementById('user-answer');
         const nextBtn = document.getElementById('next-btn');
-        const streakEl = document.getElementById('streak-display');
+        const checkBtn = document.getElementById('check-btn');
+        const feedback = document.getElementById('feedback');
 
-        if (inputEl.value === "") return;
+        if (input.value === "") return;
 
-        if (parseInt(inputEl.value) === currentAnswer) {
-            streak++;
-            feedbackEl.innerText = "Correct! ✨";
-            feedbackEl.className = "correct bounce-in";
-            triggerCelebration();
-
-            // Level Up logic
-            if (streak > 0 && streak % 5 === 0) {
-                colorIndex = (colorIndex + 1) % levelColors.length;
-                document.body.style.backgroundColor = levelColors[colorIndex];
-                feedbackEl.innerText = `LEVEL UP! Streak of ${streak}! 🔥`;
-            }
+        if (parseInt(input.value) === currentAnswer) {
+            strawberryBurst();
+            feedback.innerText = "SWEET! 🍓";
+            feedback.style.color = "var(--strawberry)";
         } else {
-            streak = 0; // Reset streak on mistake
-            feedbackEl.innerText = `Try Again! It was ${currentAnswer}`;
-            feedbackEl.className = "wrong bounce-in";
+            brainFreeze();
+            feedback.innerText = `BRRR! IT WAS ${currentAnswer}`;
+            feedback.style.color = "var(--black)";
         }
 
-        streakEl.innerText = `STREAK: ${streak}`;
-        checkBtn.style.display = 'none';
-        nextBtn.style.display = 'block';
+        feedback.style.display = "block";
+        checkBtn.style.display = "none";
+        nextBtn.style.display = "block";
     }
 
     function nextProblem() {
-        const inputEl = document.getElementById('user-answer');
-        inputEl.value = "";
-        document.getElementById('feedback').className = "";
-        document.getElementById('feedback').style.display = 'none';
-        document.getElementById('next-btn').style.display = 'none';
-        document.getElementById('check-btn').style.display = 'block';
+        document.getElementById('user-answer').value = "";
+        document.getElementById('feedback').style.display = "none";
+        document.getElementById('next-btn').style.display = "none";
+        document.getElementById('check-btn').style.display = "block";
         generateProblem();
-        inputEl.focus();
+        document.getElementById('user-answer').focus();
     }
 
-    // Keyboard support
     document.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             if (document.getElementById('next-btn').style.display === 'block') nextProblem();
@@ -218,10 +246,8 @@
         }
     });
 
-    // Start
     generateProblem();
 
-    // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js');
     }
